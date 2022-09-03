@@ -1,2 +1,2 @@
 # GuessTheFlagSwiftUI
-Simple SwiftUI game
+SwiftUI game
