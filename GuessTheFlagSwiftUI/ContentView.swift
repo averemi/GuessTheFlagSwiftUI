@@ -9,10 +9,16 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var showingScore = false
+    @State private var showingAnswer = false
+    @State private var showingFinalScore = false
     @State private var scoreTitle = ""
+    @State private var totalScore = 0
     
-    @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Spain", "UK", "US"]
+    @State private var countries = ["Ukraine", "Estonia", "France", "Ireland", "Italy", "Nigeria", "Poland", "Spain", "UK", "US"]
     @State private var correctAnswer = Int.random(in: 0...2)
+    @State private var chosenAnswer = ""
+    
+    @State private var questionCount = 0
 
     var body: some View {
         ZStack {
@@ -57,7 +63,7 @@ struct ContentView: View {
                 Spacer()
                 Spacer()
                 
-                Text("Score ???")
+                Text("Score \(totalScore)")
                     .foregroundColor(.white)
                     .font(.title.bold())
                 
@@ -68,18 +74,47 @@ struct ContentView: View {
         .alert(scoreTitle, isPresented: $showingScore) {
             Button("Continue", action: askQuestion)
         } message: {
-            Text("Your score is ???")
+            Text("Your score is \(totalScore)")
+        }
+        .alert(scoreTitle, isPresented: $showingAnswer) {
+            Button("Continue", action: askQuestion)
+        } message: {
+            Text("This is the flag of \(chosenAnswer)")
+        }
+        .alert(scoreTitle, isPresented: $showingFinalScore) {
+            Button("Restart", action: restart)
+            Button("Dismiss") {}
+        } message: {
+            Text("Your final score is \(totalScore)" + "\n" + "Would you like to restart?")
         }
     }
     
     func flagTapped(_ number: Int) {
-        scoreTitle = number == correctAnswer ? "Correct" : "Wrong"
-        showingScore = true
+        chosenAnswer = countries[number]
+        totalScore = number == correctAnswer ? totalScore + 1 : totalScore
+        scoreTitle = number == correctAnswer ? "Corect" : "Wrong"
+        questionCount += 1
+        guard questionCount <= 7 else {
+            showingFinalScore = true
+            return
+        }
+    
+        if number == correctAnswer {
+            showingScore = true
+        } else {
+            showingAnswer = true
+        }
     }
 
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+    
+    func restart() {
+        askQuestion()
+        questionCount = 0
+        totalScore = 0
     }
 }
 
