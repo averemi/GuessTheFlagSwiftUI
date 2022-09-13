@@ -19,6 +19,8 @@ struct ContentView: View {
     
     @State private var questionCount = 0
     
+    @State private var animationAmount = 0.0
+
     @ViewBuilder var gradientView: some View {
         RadialGradient(stops: [
             .init(color: Color(red: 0.1, green: 0.2, blue: 0.45), location: 0.3),
@@ -38,10 +40,17 @@ struct ContentView: View {
 
             ForEach(0..<3) { number in
                 Button {
+                    if number == correctAnswer {
+                        withAnimation(.easeInOut(duration: 1.0)) {
+                            animationAmount += 360
+                        }
+                    }
                     flagTapped(number)
                 } label: {
                     FlagImage(country: countries[number])
                 }
+                .rotation3DEffect(.degrees(number == correctAnswer ? animationAmount : 0),
+                                  axis: (x: 0.0, y: 1.0, z: 0.0))
             }
         }
     }
