@@ -19,7 +19,10 @@ struct ContentView: View {
     
     @State private var questionCount = 0
     
-    @State private var animationAmount = 0.0
+    @State private var rotationAmount = 0.0
+    @State private var opacityAmount = 1.0
+    @State private var scaleAmount = 1.0
+    @State private var selectedFlag: Int?
 
     @ViewBuilder var gradientView: some View {
         RadialGradient(stops: [
@@ -40,16 +43,19 @@ struct ContentView: View {
 
             ForEach(0..<3) { number in
                 Button {
-                    if number == correctAnswer {
-                        withAnimation(.easeInOut(duration: 1.0)) {
-                            animationAmount += 360
-                        }
+                    selectedFlag = number
+                    withAnimation {
+                        rotationAmount += 360
+                        opacityAmount -= 0.75
+                        scaleAmount -= 0.15
                     }
                     flagTapped(number)
                 } label: {
                     FlagImage(country: countries[number])
                 }
-                .rotation3DEffect(.degrees(number == correctAnswer ? animationAmount : 0),
+                .opacity(number == selectedFlag ? 1.0 : opacityAmount)
+                .scaleEffect(number == selectedFlag ? 1.0 : scaleAmount)
+                .rotation3DEffect(.degrees(number == selectedFlag ? rotationAmount : 0),
                                   axis: (x: 0.0, y: 1.0, z: 0.0))
             }
         }
@@ -115,6 +121,7 @@ struct ContentView: View {
     }
 
     func askQuestion() {
+        resetAnimation()
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
@@ -123,6 +130,13 @@ struct ContentView: View {
         askQuestion()
         questionCount = 0
         totalScore = 0
+    }
+    
+    func resetAnimation() {
+        selectedFlag = nil
+        opacityAmount = 1.0
+        scaleAmount = 1.0
+        rotationAmount = 0.0
     }
 }
 
