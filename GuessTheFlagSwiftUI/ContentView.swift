@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showingScore = false
     @State private var showingAnswer = false
     @State private var showingFinalScore = false
     @State private var scoreTitle = ""
@@ -90,6 +91,11 @@ struct ContentView: View {
             }
             .padding()
         }
+        .alert(scoreTitle, isPresented: $showingScore) {
+            Button("Continue", action: askQuestion)
+        } message: {
+            Text("Your score is \(totalScore)")
+        }
         .alert(scoreTitle, isPresented: $showingAnswer) {
             Button("Continue", action: askQuestion)
         } message: {
@@ -114,7 +120,7 @@ struct ContentView: View {
         }
     
         if number == correctAnswer {
-            askQuestion()
+            showingScore = true
         } else {
             showingAnswer = true
         }
